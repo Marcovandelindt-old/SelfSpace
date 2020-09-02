@@ -2,11 +2,20 @@
 
 class Home extends BaseController
 {
-	public function index()
-	{
-		return view('welcome_message');
-	}
-
-	//--------------------------------------------------------------------
+    /**
+     * @index action
+     * 
+     */
+    public function index()
+    {
+        $data = [
+            'title' => 'Home',
+            'page'  => 'home',
+        ];
+        
+        echo view('layouts/header', $data);
+        echo view('home/index', $data);
+        echo view('layouts/footer', $data);
+    }
 
 }
