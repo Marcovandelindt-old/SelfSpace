@@ -28,9 +28,9 @@ class Home extends BaseController
      */
     public function getWeatherData()
     {
-        $apiKey   = 'd7d8762ea563696df7fe7aa835b72245';
-        $url      = 'https://api.openweathermap.org/data/2.5/weather?q=Mijdrecht&appid=' . $apiKey . '&units=metric';
-        
+        $setting  = new \App\Models\Setting();
+        $apiKey   = $setting->getByName('openWeatherApiKey')->value;
+        $url      = 'https://api.openweathermap.org/data/2.5/weather?q=Mijdrecht&appId=' . $apiKey . '&units=metric';
         $contents = file_get_contents($url);
         $data     = json_decode($contents);
         
