@@ -29,14 +29,7 @@ class Setting extends BaseController
         $settingModel = new \App\Models\Setting();
         
         if ($this->request->getMethod() == 'post') {
-            foreach ($this->request->getPost('setting') AS $key => $value) {
-                $settingId = $settingModel->getByName($key)->settingId;
-                $settingModel->update($settingId,
-                    [
-                        $key => $value,
-                    ]
-                );
-            }
+           $settingModel->updateData($this->request->getPost('setting'));
         }
         
         return redirect()->back()->with('message', 'Settings saved');

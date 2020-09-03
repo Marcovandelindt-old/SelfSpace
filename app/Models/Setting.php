@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use CodeIgniter\Database\Query;
 
 class Setting extends Model 
 {
@@ -38,5 +39,21 @@ class Setting extends Model
         }
         
         return false;
+    }
+    
+    /**
+     * Update records
+     * 
+     * @param array $settings
+     */
+    public function updateData($settings)
+    {
+        if (!empty($settings)) {
+            $database = \Config\Database::connect();
+            
+            foreach ($settings as $key => $value) {
+                $query = $database->query('UPDATE `settings` SET `value` = "' . $value . '" WHERE `name` = "' . $key . '" LIMIT 1');
+            }
+        }
     }
 }
