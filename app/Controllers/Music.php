@@ -84,15 +84,19 @@ class Music extends BaseController
      */
     public function setSpotifyCode()
     {
-        $this->spotifySession->requestAccessToken($this->request->getGet('code'));
-        $this->spotifyApi->setAccessToken($this->spotifySession->getAccessToken());        
-    }
-    
-    /**
-     * Get recent Spotify tracks
-     */
-    public function getRecentTracks()
-    {
+        $settingModel = new \App\Models\Setting();
         
+        $this->spotifySession->requestAccessToken($this->request->getGet('code'));
+        
+        $accessToken  = $this->spotifySession->getAccessToken();
+        $refreshToken = $this->spotifySession->getRefreshToken();
+        
+        $updateData = [];
+        if (!empty($accessToken) && !empty($refreshToken)) {
+            $updateData['spotifyAccessToken']  = $accessToken;
+            $updateData['spotifyRefreshToken'] = $refreshToken;
+            
+            $settingModel->updateData($updateData);
+        }
     }
 }
