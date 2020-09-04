@@ -12,6 +12,18 @@ use App\Models\Spotify as Spotify;
 
 class Music extends BaseController 
 {   
+    public function __construct()
+    {
+        $settingModel = new \App\Models\Setting();
+        $this->spotifySession = new SpotifySession(
+            $settingModel->getByName('spotifyClientId')->value,
+            $settingModel->getByName('spotifyClientSecret')->value,
+            $settingModel->getByName('spotifyRedirectURI')->value
+        );
+        
+        $this->spotifyApi = new SpotifyWebAPI();
+    }
+    
     /**
      * @index action
      */
@@ -36,19 +48,7 @@ class Music extends BaseController
      * Authorize at Spotify
      */
     public function authorize()
-    {
-        $settingModel = new \App\Models\Setting();
-        
-        # Create Spotify Session
-        $spotifySession = new SpotifySession(
-            $settingModel->getByName('spotifyClientId')->value,
-            $settingModel->getByName('spotifyClientSecret')->value,
-            $settingModel->getByName('spotifyRedirectURI')->value
-        );
-        
-        # Create new API Instance
-        $spotifyApi = new SpotifyWebAPI();
-            
+    {       
         # Set Scopes
         $options = [
             'scope' => [
@@ -76,7 +76,7 @@ class Music extends BaseController
         ];
 
         # Redirect to Spotify
-        return redirect()->to($spotifySession->getAuthorizeUrl($options));
+        return redirect()->to($this->spotifySession->getAuthorizeUrl($options));
     }
     
     /**
@@ -84,19 +84,15 @@ class Music extends BaseController
      */
     public function setSpotifyCode()
     {
-        $settingModel = new \App\Models\Setting();
+        $this->spotifySession->requestAccessToken($this->request->getGet('code'));
+        $this->spotifyApi->setAccessToken($this->spotifySession->getAccessToken());        
+    }
+    
+    /**
+     * Get recent Spotify tracks
+     */
+    public function getRecentTracks()
+    {
         
-        # Create Spotify Session
-        $spotifySession = new SpotifySession(
-            $settingModel->getByName('spotifyClientId')->value,
-            $settingModel->getByName('spotifyClientSecret')->value,
-            $settingModel->getByName('spotifyRedirectURI')->value
-        );
-        
-        # Create new API Instance
-        $spotifyApi = new SpotifyWebAPI();
-        
-        $spotifySession->requestAccessToken($this->request->getGet('code'));
-        $spotifyApi->setAccessToken($spotifySession->getAccessToken());        
     }
 }

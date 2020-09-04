@@ -42,6 +42,12 @@
                     <input type="text" class="form-control" name="setting[spotifyClientSecret]" id="spotifyClientSecret" value="<?= $setting->getByName('spotifyClientSecret')->value ?>" />
                 </div>
             </div>
+            <div class="form-group row">
+                <label for="spotifyRedirectURI" class="col-sm-2 col-form-label">Spotify Redirect URI</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="setting[spotifyRedirectURI]" id="spotifyRedirectURI" value="<?= $setting->getByName('spotifyRedirectURI')->value ?>" />
+                </div>
+            </div>
         </div>
         <br />
         <div class="form-section">
