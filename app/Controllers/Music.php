@@ -9,6 +9,7 @@ use App\Libraries\SpotifyWebAPI\SpotifyWebAPIAuthException as SpotifyWebAPIAuthE
 use App\Libraries\SpotifyWebAPI\SpotifyWebAPIException as SpotifyWebAPIException;
 
 use App\Models\Spotify as Spotify;
+use App\Models\Track as Track;
 
 class Music extends BaseController 
 {   
@@ -97,6 +98,41 @@ class Music extends BaseController
             $updateData['spotifyRefreshToken'] = $refreshToken;
             
             $settingModel->updateData($updateData);
+        }
+    }
+    
+    /**
+     * Get recent tracks
+     */
+    public function getRecentTracks()
+    {
+        $settingModel       = new \App\Models\Setting();
+        $trackModel         = new \App\Models\Track();
+        $spotifyAccessToken = $settingModel->getByName('spotifyAccessToken')->value;
+        
+        $this->spotifyApi->setAccessToken($spotifyAccessToken);
+        
+        $recentTracks = $this->spotifyApi->getMyRecentTracks(50);
+        if (!empty($recentTracks)) {
+            foreach ($recentTracks->items as $recentTrack) {
+                $track      = $recentTrack->track; 
+                $systemName = Track::generateSystemName($track->name);
+               
+                # If the track does not exists, add to database
+                if (!Track::exists($systemName)) {                    
+                    $data = [
+                        'spotifyId'  => $track->id,
+                        'name'       => $track->name,
+                        'systemName' => $systemName,
+                        'image'      => $track->album->images[0]->url,
+                        'discNumber' => $track->disc_number,
+                        'durationMs' => $track->duration_ms,
+                        'popularity' => $track->popularity,
+                    ];
+                    
+                    Track::add($data);
+                }
+            }
         }
     }
 }
