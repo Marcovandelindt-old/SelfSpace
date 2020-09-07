@@ -70,4 +70,35 @@ class Artist extends Model
         
         return false;
     }
+    
+    /**
+     * Get the artists by trackId
+     * 
+     * @param int $trackId
+     * 
+     * @return array
+     */
+    public static function getByTrackId($trackId)
+    {
+        $database = \Config\Database::connect();
+        $builder  = $database->table('tracks_artists');
+        $query    = $builder->where('trackId', $trackId);
+        
+        $result = $query->get()->getResultArray();
+        
+        $artists = [];
+        if (!empty($result)) {
+            foreach ($result as $trackArtist) {
+                $builder2 = $database->table('artists');
+                $query2   = $builder2->where('artistId', $trackArtist['artistId']);
+                $result2  = $query2->get()->getUnbufferedRow();
+                
+                if (!empty($result2)) {
+                    $artists[] = $result2;
+                }
+            }
+        }
+        
+        return $artists;
+    }
 }

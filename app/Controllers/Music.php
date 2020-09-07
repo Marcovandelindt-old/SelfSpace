@@ -37,7 +37,19 @@ class Music extends BaseController
             foreach (PlayedTrack::getTodaysTracks() as $todaysTrack) {
                 $track           = Track::getById($todaysTrack['trackId']);
                 $track->playedAt = $todaysTrack['playedAt'];
-                $todaysTracks[]  = $track;
+                
+                # Get the artists related to the track
+                $artists      = Artist::getByTrackId($track->trackId);
+                $trackArtists = [];
+                if (!empty($artists)) {
+                    foreach ($artists as $artist) {
+                        $trackArtists[] = $artist->name;
+                    }
+                }
+                
+                $artistsString  = implode(', ', $trackArtists);
+                $track->artists = $artistsString;
+                $todaysTracks[] = $track;
             }
         }
         

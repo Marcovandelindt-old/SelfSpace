@@ -11213,3 +11213,25 @@ body.sidebar-toggled footer.sticky-footer {
 .margin-bottom-10px {
   margin-bottom: 10px;
 }
+
+.custom-track-media {
+    padding: 10px;
+    background: #fff;
+    border-radius: 5px;
+}
+
+.custom-track-media p {
+    color: #212121;
+    margin-top: 20px;
+    font-size: 16px;
+    letter-spacing: 1px;
+}
+
+.custom-track-media .media-body {
+    display: flex;
+}
+
+.custom-track-media .media-body div {
+    flex: 1;
+    text-align: center;
+}
