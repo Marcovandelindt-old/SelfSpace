@@ -49,4 +49,26 @@ class PlayedTrack extends Model
         $builder  = $database->table('played_tracks');
         $query    = $builder->insert($data);  
     }
+    
+    /**
+     * Get todays tracks
+     * 
+     * @return array
+     * 
+     * @return mixed $result | false
+     */
+    public static function getTodaysTracks()
+    {
+       $database = \Config\Database::connect();
+       $builder  = $database->table('played_tracks');
+       $builder->where('date', date('Y-m-d'));
+       
+       $result = $builder->get()->getResultArray();
+       
+       if (!empty($result)) {
+           return $result;
+       }
+       
+       return false;
+    }
 }

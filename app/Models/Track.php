@@ -90,4 +90,26 @@ class Track extends Model
         $builder  = $database->table('tracks');
         $query    = $builder->insert($data);  
     }
+    
+    /**
+     * Get a track by id
+     * 
+     * @param int $id
+     * 
+     * @return mixed $result | false
+     */
+    public static function getById($id)
+    {
+        $database = \Config\Database::connect();
+        $builder = $database->table('tracks');
+        $builder->where('trackId', $id);
+        
+        $result = $builder->get()->getUnbufferedRow();
+        
+        if (!empty($result)) {
+            return $result;
+        }
+        
+        return false;
+    }
 }

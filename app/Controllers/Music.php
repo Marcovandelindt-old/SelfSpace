@@ -32,9 +32,17 @@ class Music extends BaseController
      */
     public function index()
     {   
+        $todaysTracks = [];
+        foreach (PlayedTrack::getTodaysTracks() as $todaysTrack) {
+            $track           = Track::getById($todaysTrack['trackId']);
+            $track->playedAt = $todaysTrack['playedAt'];
+            $todaysTracks[]  = $track;
+        }
+        
         $data = [
-            'title' => 'Music',
-            'name'  => 'music'
+            'title'        => 'Music',
+            'name'         => 'music',
+            'todaysTracks' => $todaysTracks,
         ];
         
         if (!empty($this->request->getGet('code'))) {
@@ -145,11 +153,13 @@ class Music extends BaseController
                 $adjustedDateTime->add($interval);
                 $playedAtTime     = $adjustedDateTime->format('Y-m-d H:i:s');
                 $timestamp        = strtotime($playedAtTime);
+                $date             = date('Y-m-d', $timestamp);
                 
                 if (!PlayedTrack::exists($timestamp, $savedTrack->trackId)) {
                    $data = [
                        'trackId'  => $savedTrack->trackId,
                        'playedAt' => $timestamp,
+                       'date'     => $date
                    ];
                    
                    PlayedTrack::add($data);
