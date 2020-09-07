@@ -10,6 +10,7 @@ use App\Libraries\SpotifyWebAPI\SpotifyWebAPIException as SpotifyWebAPIException
 
 use App\Models\Spotify as Spotify;
 use App\Models\Track as Track;
+use App\Models\PlayedTrack as PlayedTrack;
 
 class Music extends BaseController 
 {   
@@ -112,7 +113,7 @@ class Music extends BaseController
         
         $this->spotifyApi->setAccessToken($spotifyAccessToken);
         
-        $recentTracks = $this->spotifyApi->getMyRecentTracks(50);
+        $recentTracks = $this->spotifyApi->getMyRecentTracks(['limit' => 50]);
         if (!empty($recentTracks)) {
             foreach ($recentTracks->items as $recentTrack) {
                 $track      = $recentTrack->track; 
@@ -131,6 +132,27 @@ class Music extends BaseController
                     ];
                     
                     Track::add($data);
+                }
+                
+                $savedTrack = Track::getBySystemName($systemName);
+                
+                # Save played track if not exists
+                $correctTimezone  = new \DateTimeZone('Europe/Amsterdam');
+                $adjustedDateTime = new \DateTime($recentTrack->played_at, $correctTimezone);
+                $offset           = $correctTimezone->getOffset($adjustedDateTime);
+                $interval         = \DateInterval::createFromDateString((string) $offset . 'seconds');
+                $adjustedDateTime->add($interval);
+                $playedAtTime     = $adjustedDateTime->format('Y-m-d H:i:s');
+                $timestamp        = strtotime($playedAtTime);
+                
+                if (!PlayedTrack::exists($timestamp, $savedTrack->trackId)) {
+                   $data = [
+                       'trackId'  => $savedTrack->trackId,
+                       'playedAt' => $timestamp,
+                   ];
+                   
+                   PlayedTrack::add($data);
+                   
                 }
             }
         }

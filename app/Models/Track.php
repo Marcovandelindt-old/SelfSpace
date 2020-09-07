@@ -22,14 +22,15 @@ class Track extends Model
      * 
      * @return mixed
      */
-    public function getBySystemName($systemName)
+    public static function getBySystemName($systemName)
     {
         $database = \Config\Database::connect();
-        $builder  = $database->table($this->table);
+        $builder  = $database->table('tracks');
         $query    = $builder->where('systemName', $systemName);
-        $result   = $query->getRow();
         
-        if (isset($result)) {
+        $result = $builder->get()->getUnbufferedRow();
+        
+        if (!empty($result)) {
             return $result;
         }
         
