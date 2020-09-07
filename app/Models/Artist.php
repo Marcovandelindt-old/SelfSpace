@@ -48,4 +48,26 @@ class Artist extends Model
         $builder  = $database->table('artists');
         $query    = $builder->insert($data);  
     }
+    
+    /**
+     * Get artist by spotifyId
+     * 
+     * @param string $spotifyId
+     * 
+     * @return mixed $result | false
+     */
+    public static function getBySpotifyId($spotifyId)
+    {
+        $database = \Config\Database::connect();
+        $builder  = $database->table('artists');
+        $query    = $builder->where('spotifyId', $spotifyId);
+        
+        $result = $builder->get()->getUnbufferedRow();
+        
+        if (!empty($result)) {
+            return $result;
+        }
+        
+        return false;
+    }
 }

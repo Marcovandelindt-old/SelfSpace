@@ -33,10 +33,12 @@ class Music extends BaseController
     public function index()
     {   
         $todaysTracks = [];
-        foreach (PlayedTrack::getTodaysTracks() as $todaysTrack) {
-            $track           = Track::getById($todaysTrack['trackId']);
-            $track->playedAt = $todaysTrack['playedAt'];
-            $todaysTracks[]  = $track;
+        if (!empty(PlayedTrack::getTodaysTracks())) {
+            foreach (PlayedTrack::getTodaysTracks() as $todaysTrack) {
+                $track           = Track::getById($todaysTrack['trackId']);
+                $track->playedAt = $todaysTrack['playedAt'];
+                $todaysTracks[]  = $track;
+            }
         }
         
         $data = [
@@ -179,6 +181,13 @@ class Music extends BaseController
                        ];
                        
                        Artist::add($data);
+                    }
+                    
+                    # Save relation between artist and track
+                    $savedArtist = Artist::getBySpotifyId($spotifyArtist->id);
+                    
+                    if (!Track::hasRelationWithArtist($savedArtist->artistId, $savedTrack->trackId)) {
+                        Track::addRelationWithArtist($savedArtist->artistId, $savedTrack->trackId);
                     }
                 }
             }

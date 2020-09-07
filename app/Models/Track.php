@@ -112,4 +112,46 @@ class Track extends Model
         
         return false;
     }
+    
+    /**
+     * Check if relation between track and artist exists
+     * 
+     * @param int $artistId
+     * @param int $trackId
+     * 
+     * @return bool true | false
+     */
+    public function hasRelationWithArtist($artistId, $trackId)
+    {
+        $database = \Config\Database::connect();
+        $builder  = $database->table('tracks_artists');
+        $builder->where(['trackId' => $trackId, 'artistId' => $artistId]);
+        
+        $result = $builder->get()->getUnbufferedRow();
+        
+        if (!empty($result)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Add relation between track and artist
+     * 
+     * @param int $artistId
+     * @param int $trackId
+     * 
+     */
+    public static function addRelationWithArtist($artistId, $trackId)
+    {
+        $data = [
+            'trackId'  => $trackId,
+            'artistId' => $artistId,
+        ];
+        
+        $database = \Config\Database::connect();
+        $builder  = $database->table('tracks_artists');
+        $builder->insert($data);
+    }
 }
