@@ -11,6 +11,7 @@ use App\Libraries\SpotifyWebAPI\SpotifyWebAPIException as SpotifyWebAPIException
 use App\Models\Spotify as Spotify;
 use App\Models\Track as Track;
 use App\Models\PlayedTrack as PlayedTrack;
+use App\Models\Artist as Artist;
 
 class Music extends BaseController 
 {   
@@ -153,6 +154,22 @@ class Music extends BaseController
                    
                    PlayedTrack::add($data);
                    
+                }
+                
+                # Save the artist(s) if needed
+                foreach ($track->artists as $artist) {
+                    $spotifyArtist = $this->spotifyApi->getArtist($artist->id);
+                    if (!Artist::exists($spotifyArtist->id)) {
+                       $data = [
+                           'name'       => $spotifyArtist->name,
+                           'spotifyId'  => $spotifyArtist->id,
+                           'image'      => $spotifyArtist->images[0]->url,
+                           'popularity' => $spotifyArtist->popularity,
+                           'followers'  => $spotifyArtist->followers->total,
+                       ];
+                       
+                       Artist::add($data);
+                    }
                 }
             }
         }
