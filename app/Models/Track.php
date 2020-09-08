@@ -154,4 +154,28 @@ class Track extends Model
         $builder  = $database->table('tracks_artists');
         $builder->insert($data);
     }
+    
+     /**
+     * Get the artists related to a track
+     * 
+     * @param int $artistId
+     * @param int $trackId
+     * 
+     * @return bool true | false
+     */
+    public static function getArtists($trackId)
+    {
+        $database = \Config\Database::connect();
+        $builder  = $database->table('tracks_artists');
+        $builder->where(['trackId' => $trackId]);
+        
+        $result = $builder->get()->getResultArray();
+        
+        if (!empty($result)) {
+            return $result;
+        }
+        
+        return false;
+    }
+    
 }

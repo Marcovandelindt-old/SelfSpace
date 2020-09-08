@@ -101,4 +101,26 @@ class Artist extends Model
         
         return $artists;
     }
+    
+    /**
+     * Get an artist by id
+     * 
+     * @param int $artistId
+     * 
+     * @return mixed object | false
+     */
+    public static function getById($artistId)
+    {
+        $database = \Config\Database::connect();
+        $builder  = $database->table('artists');
+        $query    = $builder->where('artistId', $artistId);
+        
+        $result = $query->get()->getUnbufferedRow();
+        
+        if (!empty($result)) {
+            return $result;
+        }
+        
+        return false;
+    }
 }

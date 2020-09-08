@@ -15,6 +15,8 @@ use App\Models\Artist as Artist;
 
 class Music extends BaseController 
 {   
+    protected $helpers = ['music'];
+    
     public function __construct()
     {
         $settingModel = new \App\Models\Setting();
@@ -31,7 +33,8 @@ class Music extends BaseController
      * @index action
      */
     public function index()
-    {   
+    { 
+        # Get all played tracks today
         $todaysTracks = [];
         if (!empty(PlayedTrack::getTodaysTracks())) {
             foreach (PlayedTrack::getTodaysTracks() as $todaysTrack) {
@@ -53,10 +56,18 @@ class Music extends BaseController
             }
         }
         
+        # Calculate the total listening time
+        $totalListeningTime = calculateTotalListeningTimeToday($todaysTracks);
+        
+        # Get all different artists played today
+        $todaysArtists      = calculateTodaysDifferentArtists($todaysTracks);
+        
         $data = [
-            'title'        => 'Music',
-            'name'         => 'music',
-            'todaysTracks' => $todaysTracks,
+            'title'              => 'Music',
+            'name'               => 'music',
+            'todaysTracks'       => $todaysTracks,
+            'totalListeningTime' => $totalListeningTime,
+            'todaysArtists'      => $todaysArtists,
         ];
         
         if (!empty($this->request->getGet('code'))) {
